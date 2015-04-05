@@ -82,33 +82,80 @@ namespace Gfi.Hiring
 		{
 			Pawn firstPawn = new Pawn(PieceColor.Black);
 			Pawn secondPawn = new Pawn(PieceColor.Black);
-			_chessBoard.Add(firstPawn, 6, 3, PieceColor.Black);
-			_chessBoard.Add(secondPawn, 6, 3, PieceColor.Black);
+			_chessBoard.Add(firstPawn, 6, 3);
+			_chessBoard.Add(secondPawn, 6, 3);
 			Assert.That(firstPawn.XCoordinate, Is.EqualTo(6));
 			Assert.That(firstPawn.YCoordinate, Is.EqualTo(3));
 			Assert.That(secondPawn.XCoordinate, Is.EqualTo(-1));
 			Assert.That(secondPawn.YCoordinate, Is.EqualTo(-1));
 		}
 
+        [Test]
+        public void Avoids_Adding_To_Enemy_Position()
+        {
+            Pawn blackPawn = new Pawn(PieceColor.Black);
+            Pawn whitePawn = new Pawn(PieceColor.White);
+            _chessBoard.Add(blackPawn, 6, 3);
+            _chessBoard.Add(whitePawn, 6, 3);
+            Assert.That(blackPawn.XCoordinate, Is.EqualTo(6));
+            Assert.That(blackPawn.YCoordinate, Is.EqualTo(3));
+            Assert.That(whitePawn.XCoordinate, Is.EqualTo(-1));
+            Assert.That(whitePawn.YCoordinate, Is.EqualTo(-1));
+        }
+
 		[Test]
 		public void Limits_The_Number_Of_Pawns()
 		{
 			for (int i = 0; i < 10; i++)
 			{
-				Pawn pawn = new Pawn(PieceColor.Black);
-				int row = i / ChessBoard.MaxBoardWidth;
-				_chessBoard.Add(pawn, 6 + row, i % ChessBoard.MaxBoardWidth, PieceColor.Black);
+				Pawn blackPawn = new Pawn(PieceColor.Black);
+                Pawn whitePawn = new Pawn(PieceColor.White);
+				int row = i / (ChessBoard.MaxBoardHeight + 1);
+                _chessBoard.Add(blackPawn, i % (ChessBoard.MaxBoardWidth + 1), 6 + row);
+                _chessBoard.Add(whitePawn, i % (ChessBoard.MaxBoardWidth + 1), 1 - row);
 				if (row < 1)
 				{
-					Assert.That(pawn.XCoordinate, Is.EqualTo(6 + row));
-					Assert.That(pawn.YCoordinate, Is.EqualTo(i % ChessBoard.MaxBoardWidth));
+					Assert.That(blackPawn.XCoordinate, Is.EqualTo(i % (ChessBoard.MaxBoardWidth + 1)));
+                    Assert.That(blackPawn.YCoordinate, Is.EqualTo(6 + row));
+                    Assert.That(whitePawn.XCoordinate, Is.EqualTo(i % (ChessBoard.MaxBoardWidth + 1)));
+                    Assert.That(whitePawn.YCoordinate, Is.EqualTo(1 - row));
 				}
 				else
 				{
-					Assert.That(pawn.XCoordinate, Is.EqualTo(-1));
-					Assert.That(pawn.YCoordinate, Is.EqualTo(-1));
+					Assert.That(blackPawn.XCoordinate, Is.EqualTo(-1));
+					Assert.That(blackPawn.YCoordinate, Is.EqualTo(-1));
+                    Assert.That(whitePawn.XCoordinate, Is.EqualTo(-1));
+                    Assert.That(whitePawn.YCoordinate, Is.EqualTo(-1));
 				}
 			}
 		}
+
+        [Test]
+        public void Limits_The_Number_Of_Knights()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+				Knight blackKnight = new Knight(PieceColor.Black);
+                Knight whiteKnight = new Knight(PieceColor.White);
+				int row = i / (ChessBoard.MaxBoardHeight + 1);
+                int col = i % (ChessBoard.MaxBoardWidth + 1);
+                _chessBoard.Add(blackKnight, col, 6 + row);
+                _chessBoard.Add(whiteKnight, col, 1 - row);
+				if (i < 2)
+				{
+					Assert.That(blackKnight.XCoordinate, Is.EqualTo(i % (ChessBoard.MaxBoardWidth + 1)));
+                    Assert.That(blackKnight.YCoordinate, Is.EqualTo(6 + row));
+                    Assert.That(whiteKnight.XCoordinate, Is.EqualTo(i % (ChessBoard.MaxBoardWidth + 1)));
+                    Assert.That(whiteKnight.YCoordinate, Is.EqualTo(1 - row));
+				}
+				else
+				{
+					Assert.That(blackKnight.XCoordinate, Is.EqualTo(-1));
+					Assert.That(blackKnight.YCoordinate, Is.EqualTo(-1));
+                    Assert.That(whiteKnight.XCoordinate, Is.EqualTo(-1));
+                    Assert.That(whiteKnight.YCoordinate, Is.EqualTo(-1));
+				}
+			}
+        }
 	}
 }

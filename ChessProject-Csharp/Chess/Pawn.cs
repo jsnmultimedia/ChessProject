@@ -2,55 +2,41 @@
 
 namespace Gfi.Hiring
 {
-    public class Pawn
+    public class Pawn : PieceBase
     {
-        private ChessBoard _chessBoard;
-        private int _xCoordinate;
-        private int _yCoordinate;
-        private PieceColor _pieceColor;
-        
-        public ChessBoard ChessBoard
-        {
-            get { return _chessBoard; }
-            set { _chessBoard = value; }
-        }
-
-        public int XCoordinate
-        {
-            get { return _xCoordinate; }
-            set { _xCoordinate = value; }
-        }
-        
-        public int YCoordinate
-        {
-            get { return _yCoordinate; }
-            set { _yCoordinate = value; }
-        }
-
-        public PieceColor PieceColor
-        {
-            get { return _pieceColor; }
-            private set { _pieceColor = value; }
-        }
+        public static readonly int MaxBoardPiece = 8;
 
         public Pawn(PieceColor pieceColor)
+            : base(pieceColor)
         {
-            _pieceColor = pieceColor;
         }
 
-        public void Move(MovementType movementType, int newX, int newY)
+        protected override bool LegalMove(int newX, int newY)
         {
-            throw new NotImplementedException("Need to implement Pawn.Move()");
+            // White moves up the board so Y increases
+            // Black moves down the board so Y decreases
+            int move = PieceColor.Equals(PieceColor.White) ? 1 : -1;
+
+            // Make sure our movement is 1 step forward
+            return newX.Equals(XCoordinate) && newY.Equals(YCoordinate + move);
         }
 
-        public override string ToString()
+        protected override bool LegalCapture(int newX, int newY)
         {
-            return CurrentPositionAsString();
-        }
+            // White moves up the board so Y increases
+            // Black moves down the board so Y decreases
+            int move = PieceColor.Equals(PieceColor.White) ? 1 : -1;
 
-        protected string CurrentPositionAsString()
-        {
-            return string.Format("Current X: {1}{0}Current Y: {2}{0}Piece Color: {3}", Environment.NewLine, XCoordinate, YCoordinate, PieceColor);
+            // Make Sure our capture is 1 step forward
+            if (newY.Equals(YCoordinate + move))
+            {
+                // Make sure the capture is diagonal by 1 square
+                if (newX.Equals(XCoordinate + 1) || (newX.Equals(XCoordinate - 1)))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
     }
